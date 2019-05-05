@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/briandowns/openweathermap"
 	"github.com/intelux/hubitat"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -64,7 +65,9 @@ var (
 
 // Handler implements a handler.
 type Handler struct {
-	Client *hubitat.Client
+	Client             *hubitat.Client
+	CurrentWeatherData *openweathermap.CurrentWeatherData
+	CityID             int
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -159,6 +162,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			hubitatSwitchLevelCurrent.With(prometheus.Labels{
 				deviceLabel: device.String(),
 			}).Set(value)
+		}
+	}
+
+	if h.CurrentWeatherData != nil {
+		if err = h.CurrentWeatherData.CurrentByID(h.CityID); err == nil {
+			hubitatTemperatureCurrent.With(prometheus.Labels{
+				deviceLabel: "Outside",
+			}).Set(h.CurrentWeatherData.Main.Temp)
+			hubitatHumidityCurrent.With(prometheus.Labels{
+				deviceLabel: "Outside",
+			}).Set(float64(h.CurrentWeatherData.Main.Humidity) / 100.0)
 		}
 	}
 

@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 
+	"github.com/briandowns/openweathermap"
 	"github.com/intelux/hubitat"
 	"github.com/spf13/cobra"
 )
@@ -32,10 +34,23 @@ var rootCmd = &cobra.Command{
 
 		fmt.Fprintf(cmd.OutOrStderr(), "Listening on %s.\n", endpoint)
 
+		var currentWeatherData *openweathermap.CurrentWeatherData
+
+		owmAPIKey := os.Getenv("OWM_API_KEY")
+		owmCityID, _ := strconv.Atoi(os.Getenv("OWM_CITY_ID"))
+
+		if owmAPIKey != "" && owmCityID != 0 {
+			if currentWeatherData, err = openweathermap.NewCurrent("C", "EN", owmAPIKey); err != nil {
+				return fmt.Errorf("failed to initialize Open Weather Map API: %s", err)
+			}
+		}
+
 		server := &http.Server{
 			Addr: endpoint,
 			Handler: &Handler{
-				Client: client,
+				Client:             client,
+				CurrentWeatherData: currentWeatherData,
+				CityID:             owmCityID,
 			},
 		}
 
