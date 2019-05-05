@@ -15,6 +15,9 @@ type Client struct {
 	// URL is the base URL of the Maker API. Can be either local or remote.
 	URL *url.URL
 
+	// AccessToken is the access token that protects the API.
+	AccessToken string
+
 	HTTPClient *http.Client
 }
 
@@ -51,13 +54,10 @@ func NewClient(hubURL string, accessToken string) (*Client, error) {
 		return nil, fmt.Errorf("parsing client URL: %s", err)
 	}
 
-	q := u.Query()
-	q.Set("access_token", accessToken)
-	u.RawQuery = q.Encode()
-
 	return &Client{
-		URL:        u,
-		HTTPClient: http.DefaultClient,
+		URL:         u,
+		AccessToken: accessToken,
+		HTTPClient:  http.DefaultClient,
 	}, nil
 }
 
@@ -97,5 +97,11 @@ func (c *Client) newRequest(ctx context.Context, method string, path string, bod
 }
 
 func (c *Client) url(path string) *url.URL {
-	return c.URL.ResolveReference(&url.URL{Path: path})
+	u := c.URL.ResolveReference(&url.URL{Path: path})
+
+	q := u.Query()
+	q.Set("access_token", c.AccessToken)
+	u.RawQuery = q.Encode()
+
+	return u
 }

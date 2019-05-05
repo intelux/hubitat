@@ -69,14 +69,6 @@ func main() {
 	}
 }
 
-// Handler implements a handler.
-type Handler struct {
-	Client *hubitat.Client
-}
-
-func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-}
-
 func withInterrupt(ctx context.Context) (context.Context, func()) {
 	ctx, cancel := context.WithCancel(ctx)
 
