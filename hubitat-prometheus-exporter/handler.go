@@ -193,10 +193,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if h.CurrentWeatherData != nil {
 		if err = h.CurrentWeatherData.CurrentByID(h.CityID); err == nil {
 			hubitatTemperatureCurrent.With(prometheus.Labels{
-				deviceLabel: "Outside",
+				deviceLabel: "Extérieur",
 			}).Set(h.CurrentWeatherData.Main.Temp)
 			hubitatHumidityCurrent.With(prometheus.Labels{
-				deviceLabel: "Outside",
+				deviceLabel: "Extérieur",
 			}).Set(float64(h.CurrentWeatherData.Main.Humidity) / 100.0)
 		}
 	}
