@@ -13,6 +13,8 @@ const (
 	CapabilitySwitch = "Switch"
 	// CapabilitySwitchLevel represents all the devices can act as a switch with level.
 	CapabilitySwitchLevel = "SwitchLevel"
+	// CapabilityLock represents all the devices can act as locks.
+	CapabilityLock = "Lock"
 )
 
 // Contains checks whether a capability is contained in the list of capabilities.

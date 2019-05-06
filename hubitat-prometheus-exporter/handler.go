@@ -61,6 +61,13 @@ var (
 		},
 		[]string{deviceLabel},
 	)
+	hubitatLockCurrent = promauto.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "hubitat_lock_current",
+			Help: "The current lock state of devices.",
+		},
+		[]string{deviceLabel},
+	)
 )
 
 // Handler implements a handler.
@@ -160,6 +167,24 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(os.Stderr, "Failed to get switch level for `%s`: %s", device, err)
 		} else {
 			hubitatSwitchLevelCurrent.With(prometheus.Labels{
+				deviceLabel: device.String(),
+			}).Set(value)
+		}
+	}
+
+	for _, device := range devices.LockDevices() {
+		locked, err := device.Lock()
+
+		value := 0.0
+
+		if locked {
+			value = 1.0
+		}
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to get lock state for `%s`: %s", device, err)
+		} else {
+			hubitatLockCurrent.With(prometheus.Labels{
 				deviceLabel: device.String(),
 			}).Set(value)
 		}

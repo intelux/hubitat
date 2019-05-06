@@ -98,6 +98,17 @@ func (d Devices) SwitchLevelDevices() (devices []SwitchLevelDevice) {
 	return
 }
 
+// LockDevices returns all the lock devices.
+func (d Devices) LockDevices() (devices []LockDevice) {
+	for _, device := range d {
+		if device.Capabilities.Contains(CapabilityLock) {
+			devices = append(devices, LockDevice{device})
+		}
+	}
+
+	return
+}
+
 // Attributes represents device attributes.
 type Attributes map[string]interface{}
 
@@ -214,4 +225,14 @@ type SwitchLevelDevice struct {
 // SwitchLevel returns the switch level, in percent.
 func (d *SwitchLevelDevice) SwitchLevel() (float64, error) {
 	return d.Attributes.GetPercentage("level")
+}
+
+// LockDevice represents a device that can be locked.
+type LockDevice struct {
+	Device
+}
+
+// Lock returns the locked state of the device.
+func (d *LockDevice) Lock() (bool, error) {
+	return d.Attributes.GetBoolean("lock", "locked", "unlocked")
 }
