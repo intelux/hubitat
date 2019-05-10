@@ -204,7 +204,7 @@ type HumidityDevice struct {
 
 // Humidity returns the humidity, in percent.
 func (d *HumidityDevice) Humidity() (float64, error) {
-	return d.Attributes.GetPercentage("temperature")
+	return d.Attributes.GetPercentage("humidity")
 }
 
 // SwitchDevice represents a device that can read humidity.
